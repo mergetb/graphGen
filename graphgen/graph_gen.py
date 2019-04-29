@@ -424,7 +424,7 @@ def main():
         help='Add link constraints to the access links for the vrouter',
     )
     parser.add_argument(
-        '--enable-dpdk', dest='use_dpdk', default=True,
+        '--enable-dpdk', dest='use_dpdk', default=False,
         action='store_const', const=True,
         help='Create Click template for DPDK support (note DPDK automatically enables ARP)',
         )
