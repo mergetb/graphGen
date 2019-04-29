@@ -15,6 +15,10 @@ matplotlib.use('Agg')
 # pylint: disable=wrong-import-position
 import matplotlib.pyplot as plt
 
+#pylint: disable=relative-import
+from .ns_gen import NSGen
+from .click_gen import ClickGen
+
 # networkx 2.x is not backwards compatable with 1.x
 __NX_VERSION__ = int(nx.__version__.split(".")[0])
 
