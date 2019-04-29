@@ -15,10 +15,6 @@ matplotlib.use('Agg')
 # pylint: disable=wrong-import-position
 import matplotlib.pyplot as plt
 
-#pylint: disable=relative-import
-import click_gen as click_gen
-import ns_gen as ns_gen
-
 # networkx 2.x is not backwards compatable with 1.x
 __NX_VERSION__ = int(nx.__version__.split(".")[0])
 
@@ -48,8 +44,8 @@ def read_graph(filename):
 class GraphGen(object):
 
     def __init__(self, filename, routes=None, cmdline=dict):
-        self.ns_gen = ns_gen.NSGen(cmdline)
-        self.click_gen = click_gen.ClickGen(None, None, cmdline.__dict__)
+        self.ns_gen = NSGen(cmdline)
+        self.click_gen = ClickGen(None, None, cmdline.__dict__)
 
         self.graph = read_graph(filename)
         # need to remove iteritems for py3 compatibility
