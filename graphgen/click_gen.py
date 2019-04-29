@@ -131,15 +131,16 @@ class ClickGen(object):
         else:
             # FIX THIS TOO, for MULTI HOMING
             counter = 1
-            for router in in_routers:
-                self.file_handler.write(
-                    "FromDevice(${if%d}) -> c%d;\n" % (
-                        int(re.search('[0-9]+', router).group(0)), counter)
-                )
-                counter = counter + 1
-            for i in range(self.num_others):
-                self.file_handler.write("FromDevice(${ifo%d}) -> c%d;\n" % (i + 1, counter))
-                counter = counter + 1
+            for router_list in in_routers:
+                for router in router_list:
+                    self.file_handler.write(
+                        "FromDevice(${if%d}) -> c%d;\n" % (
+                            int(re.search('[0-9]+', router).group(0)), counter)
+                    )
+                    counter = counter + 1
+                for i in range(self.num_others):
+                    self.file_handler.write("FromDevice(${ifo%d}) -> c%d;\n" % (i + 1, counter))
+                    counter = counter + 1
 
         self.file_handler.write("FromHost(fakedge0) -> chost;\n")
 
@@ -163,16 +164,17 @@ class ClickGen(object):
         else:
             # FIX NON DPDK
             counter = 1
-            for router in in_routers:
-                self.file_handler.write(
-                    "out%d :: ThreadSafeQueue() -> ToDevice(${if%d}, BURST 64);\n"
-                    % (counter, int(re.search('[0-9]+', router).group(0))))
-                counter = counter + 1
-            for i in range(self.num_others):
-                self.file_handler.write(
-                    "out%d :: ThreadSafeQueue() -> ToDevice(${ifo%d}, BURST 64);\n"
-                    % (counter, i + 1))
-                counter = counter + 1
+            for router_list in in_routers:
+                for router in router_list:
+                    self.file_handler.write(
+                        "out%d :: ThreadSafeQueue() -> ToDevice(${if%d}, BURST 64);\n"
+                        % (counter, int(re.search('[0-9]+', router).group(0))))
+                    counter = counter + 1
+                for i in range(self.num_others):
+                    self.file_handler.write(
+                        "out%d :: ThreadSafeQueue() -> ToDevice(${ifo%d}, BURST 64);\n"
+                        % (counter, i + 1))
+                    counter = counter + 1
 
     def write_arp_handler(self):
         self.file_handler.write("\n// Handle arp\n")
@@ -214,14 +216,16 @@ class ClickGen(object):
         counter = 1
         second_counter = 1
         in_routers = list(nx.get_node_attributes(self.graph, 'in_routers').values())
-        in_routers.sort(key=lambda x: int(re.search('[0-9]+', x).group(0)))
-        for router in in_routers:
-            if_n = int(re.search('[0-9]+', router).group(0))
-            self.file_handler.write(
-                "al%d :: EtherEncap(0x0800, ${if%d}:eth, ${if%d_friend})\n" %
-                (counter, if_n, if_n))
-            counter = counter + 1
-            second_counter = second_counter + 1
+        for router_list in in_routers:
+            router_list.sort(key=lambda x: int(re.search('[0-9]+', x).group(0)))
+        for router_list in in_routers:
+            for router in router_list:
+                if_n = int(re.search('[0-9]+', router).group(0))
+                self.file_handler.write(
+                    "al%d :: EtherEncap(0x0800, ${if%d}:eth, ${if%d_friend})\n" %
+                    (counter, if_n, if_n))
+                counter = counter + 1
+                second_counter = second_counter + 1
         for i in range(self.num_others):
             counter = i + 1
             self.file_handler.write(
